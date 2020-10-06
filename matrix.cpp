@@ -18,8 +18,11 @@ Matrix::MatrixStruct<T> Matrix::MatrixStruct<T>::operator + (const Matrix::Matri
 	}
 	Matrix::MatrixStruct<T> sumMatrix = Matrix::createMatrix<T>(this->nRows, this->nRows);
 	for (size_t idx = 0; idx < sumMatrix.elements.size(); ++idx) {
-		sumMatrix.elements.at(idx) = lhs->elements.at(idx) + rhs->elements.at(idx);
 		// !IMP: better to check overflow here
+		if ( Matrix::checkAdditionOverflow(lhs->elements.at(idx), rhs->elements.at(idx)) ) {
+			throw Matrix::Exception::dataOverflowDuringAdditionException();
+		}
+		sumMatrix.elements.at(idx) = lhs->elements.at(idx) + rhs->elements.at(idx);
 	}
 	return sumMatrix;
 }
@@ -34,8 +37,11 @@ Matrix::MatrixStruct<T> Matrix::MatrixStruct<T>::operator - (const Matrix::Matri
 	}
 	Matrix::MatrixStruct<T> sumMatrix = Matrix::createMatrix<T>(this->nRows, this->nRows);
 	for (size_t idx = 0; idx < sumMatrix.elements.size(); ++idx) {
-		sumMatrix.elements.at(idx) = lhs->elements.at(idx) - rhs->elements.at(idx);
 		// !IMP: better to check overflow here
+		if ( Matrix::checkAdditionOverflow(lhs->elements.at(idx), (-1) * rhs->elements.at(idx)) ) {
+			throw Matrix::Exception::dataOverflowDuringAdditionException();
+		}
+		sumMatrix.elements.at(idx) = lhs->elements.at(idx) - rhs->elements.at(idx);
 	}
 	return sumMatrix;
 }
@@ -46,8 +52,9 @@ Matrix::MatrixStruct<T> Matrix::MatrixStruct<T>::operator * (const T& scalar) co
 	const Matrix::MatrixStruct<T>* lhs = this;
 	Matrix::MatrixStruct<T> resultMatrix = Matrix::createMatrix<T>(this->nRows, this->nRows);
 	for (size_t idx = 0; idx < resultMatrix.elements.size(); ++idx) {
+		// TODO:
+		// !IMP: better to check overflow here: lhs->elements.at(idx) * scalar
 		resultMatrix.elements.at(idx) = lhs->elements.at(idx) * scalar;
-		// !IMP: better to check overflow here
 	}
 	return resultMatrix;
 }
@@ -62,7 +69,6 @@ bool Matrix::MatrixStruct<T>::operator == (const Matrix::MatrixStruct<T>& rhsMat
 		areSame = true;
 		for (size_t idx = 0; (idx < lhs->elements.size()) && areSame; ++idx) {
 			areSame = lhs->elements.at(idx) == rhs->elements.at(idx);
-			// better to check overflow here
 		}
 	}
 	return areSame;
