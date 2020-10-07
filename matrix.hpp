@@ -9,6 +9,7 @@
 
 #define USE_S_INT_MATRIX
 #define USE_U_INT_MATRIX
+#define USE_U_CHAR_MATRIX
 
 // defining struct for a Matrix object/instance
 namespace Matrix {

@@ -256,3 +256,21 @@ template void Matrix::dumpMatrixInfo<unsigned int>(const Matrix::MatrixStruct<un
 template bool Matrix::checkAdditionOverflow(const unsigned int&, const unsigned int&);
 template bool Matrix::checkMultiplicationOverflow(const unsigned int&, const unsigned int&);
 #endif
+
+#ifdef USE_U_CHAR_MATRIX
+template Matrix::MatrixStruct<unsigned char> Matrix::createMatrix<unsigned char>(const std::size_t&, const std::size_t&);
+template Matrix::MatrixStruct<unsigned char> Matrix::createMatrix<unsigned char>(const std::size_t&, const std::size_t&, const std::vector<unsigned char>&);
+template Matrix::MatrixStruct<unsigned char> Matrix::createMatrix<unsigned char>(const std::size_t&, const std::size_t&, const std::initializer_list<unsigned char>&);
+
+template Matrix::MatrixStruct<unsigned char> Matrix::convoluteMatrixUsingKernel(const Matrix::MatrixStruct<unsigned char>&, const Matrix::MatrixStruct<unsigned char>&);
+
+template unsigned char& Matrix::MatrixStruct<unsigned char>::operator () (const size_t& rowIdx, const size_t& colIdx) const;
+template Matrix::MatrixStruct<unsigned char> Matrix::MatrixStruct<unsigned char>::operator + (const Matrix::MatrixStruct<unsigned char>& rhs) const;
+template Matrix::MatrixStruct<unsigned char> Matrix::MatrixStruct<unsigned char>::operator - (const Matrix::MatrixStruct<unsigned char>& rhs) const;
+template Matrix::MatrixStruct<unsigned char> Matrix::MatrixStruct<unsigned char>::operator * (const unsigned char& scalar) const;
+template bool Matrix::MatrixStruct<unsigned char>::operator == (const Matrix::MatrixStruct<unsigned char>& rhs) const;
+
+template void Matrix::dumpMatrixInfo<unsigned char>(const Matrix::MatrixStruct<unsigned char>&);
+template bool Matrix::checkAdditionOverflow(const unsigned char&, const unsigned char&);
+template bool Matrix::checkMultiplicationOverflow(const unsigned char&, const unsigned char&);
+#endif

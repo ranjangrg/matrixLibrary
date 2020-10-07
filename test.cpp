@@ -1,4 +1,4 @@
-#include "./main.hpp"
+#include "./test.hpp"
 
 std::unordered_map<std::string, bool> testMatrixConstructors() {
 	std::unordered_map<std::string, bool> testResults = {
