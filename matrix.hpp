@@ -7,8 +7,8 @@
 #include <initializer_list>
 #include <limits>	// to check overflows
 
-#define USE_INT_MATRIX
-#define USE_UINT_MATRIX
+#define USE_S_INT_MATRIX
+#define USE_U_INT_MATRIX
 
 // defining struct for a Matrix object/instance
 namespace Matrix {
@@ -84,6 +84,11 @@ namespace Matrix {
 		struct dataOverflowDuringMultiplicationException : public std::exception {
 			const char* what() const throw () {
 				return "[ERR] [Matrix] Data value overflow/underflow detected during multiplication.";
+			}
+		};
+		struct dimensionMismatchForDotProductException : public std::exception {
+			const char* what() const throw () {
+				return "[ERR] [Matrix] Matrix dimensions not suitable for calculating dot product.";
 			}
 		};
 	}

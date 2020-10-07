@@ -158,8 +158,7 @@ std::unordered_map<std::string, bool> testMatrixOperators() {
 
 std::unordered_map<std::string, bool> testMatrixConvolution() {
 	std::unordered_map<std::string, bool> testResults = {
-		{"using Convolution method: Positive case", false},
-		{"using Convolution method: Negative case", false},
+		{"using Convolution method", false},
 		{"test Convolution overflow", false}
 	};
 
@@ -189,14 +188,14 @@ std::unordered_map<std::string, bool> testMatrixConvolution() {
 			});
 		Matrix::MatrixStruct<int> convolutedMatrix = Matrix::convoluteMatrixUsingKernel(mainMatrix, kernelMatrix);
 
-		testResults["using Convolution method: Positive case"] = true;
-		for (size_t idx = 0; (idx < convolutedMatrix.elements.size()) && testResults["using Convolution method: Positive case"]; ++idx) {
-			testResults["using Convolution method: Positive case"] = convolutedMatrix.elements.at(idx) == convolutedMatrixCorrect.elements.at(idx);
+		testResults["using Convolution method"] = true;
+		for (size_t idx = 0; (idx < convolutedMatrix.elements.size()) && testResults["using Convolution method"]; ++idx) {
+			testResults["using Convolution method"] = convolutedMatrix.elements.at(idx) == convolutedMatrixCorrect.elements.at(idx);
 		}
 		//Matrix::dumpMatrixInfo(convolutedMatrix);
 	} catch (std::exception& e) {
 		//std::cout << e.what() << std::endl;	
-		testResults["using Convolution method: Positive case"] = false;
+		testResults["using Convolution method"] = false;
 	}
 
 	// test: overflow == : 
@@ -232,6 +231,42 @@ std::unordered_map<std::string, bool> testMatrixConvolution() {
 	return testResults;
 }
 
+std::unordered_map<std::string, bool> testMatrixMethods() {
+	std::unordered_map<std::string, bool> testResults = {
+		{"using Matrix method: dot product", false}
+	};
+
+	try {
+		Matrix::MatrixStruct<int> matA  = Matrix::createMatrix<int>(2, 3, 
+			{
+				1,2,3,
+				4,5,6
+			});		
+		Matrix::MatrixStruct<int> matB  = Matrix::createMatrix<int>(3, 2, 
+			{
+				7,8,
+				9,10,
+				11,12
+			});
+		Matrix::MatrixStruct<int> matC  = Matrix::createMatrix<int>(2, 3, 
+			{
+				2,5,1,
+				4,0,7
+			});
+
+		Matrix::dumpMatrixInfo(matA);
+		std::cout << '-' << std::endl;
+		Matrix::dumpMatrixInfo(matB);
+
+		testResults["using Matrix method: dot product"] = true;
+	} catch (std::exception& e) {
+		//std::cout << e.what() << std::endl;	
+		//testResults["using Matrix method: dot product"] = true;
+	}
+
+	return testResults;
+}
+
 void printResults(const std::unordered_map<std::string, bool>& testResults) {
 	std::string result;
 	for (auto& test : testResults) {
@@ -249,6 +284,12 @@ void testAll() {
 	printResults(testResults);
 	testResults = testMatrixConvolution();
 	printResults(testResults);
+
+	/*
+	testResults = testMatrixMethods();
+	printResults(testResults);
+	*/
+	
 }
 
 int main() {

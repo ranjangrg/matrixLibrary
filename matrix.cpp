@@ -3,7 +3,7 @@
 template <typename T>
 T& Matrix::MatrixStruct<T>::operator () (const size_t& rowIdx, const size_t& colIdx) const {
 	//std::cout << "Operator method: ().\n";
-	T value = this->elements.at(rowIdx * this->nRows + colIdx);
+	T value = this->elements.at(rowIdx * this->nCols + colIdx);
 	T& valueRef = value;
 	return valueRef;
 }
@@ -132,7 +132,7 @@ Matrix::MatrixStruct<T> Matrix::convoluteMatrixUsingKernel(
 				for (unsigned int kernelColIdx = 0; kernelColIdx < kernelMatrix.nCols; ++kernelColIdx) {
 					rowOffset = (-1 * int((kernelMatrix.nRows + 1) / 2)) + 1;
 					colOffset = (-1 * int((kernelMatrix.nCols + 1) / 2)) + 1;
-					valueAtKernel = kernelMatrix.elements[kernelRowIdx * kernelMatrix.nRows + kernelColIdx];
+					valueAtKernel = kernelMatrix.elements[kernelRowIdx * kernelMatrix.nCols + kernelColIdx];
 					currRowIdx = mainRowIdx + kernelRowIdx + rowOffset;
 					currColIdx = mainColIdx + kernelColIdx + colOffset;
 					if ( 
@@ -140,7 +140,7 @@ Matrix::MatrixStruct<T> Matrix::convoluteMatrixUsingKernel(
 						(currRowIdx < mainMatrix.nRows) && (currColIdx < mainMatrix.nCols)
 					) {
 						// proceed only if row/col indices are valid(+ve) and within range
-						valueAtMat = mainMatrix.elements[(currRowIdx * mainMatrix.nRows) + currColIdx];
+						valueAtMat = mainMatrix.elements[(currRowIdx * mainMatrix.nCols) + currColIdx];
 						
 						// check for possible overflows:
 						// overflow check for (valueAtMat * valueAtKernel) AND/OR
@@ -155,7 +155,7 @@ Matrix::MatrixStruct<T> Matrix::convoluteMatrixUsingKernel(
 					}
 				}
 			}
-			resultantMatrix.elements[mainRowIdx * mainMatrix.nRows + mainColIdx] = value;
+			resultantMatrix.elements[mainRowIdx * mainMatrix.nCols + mainColIdx] = value;
 		}
 	}
 	return resultantMatrix;
@@ -165,7 +165,7 @@ template <typename T>
 void Matrix::dumpMatrixInfo(const Matrix::MatrixStruct<T>& matrix) {
 	for (size_t rowIdx = 0; rowIdx < matrix.nRows; ++rowIdx) {
 		for (size_t colIdx = 0; colIdx < matrix.nCols; ++colIdx) {
-			std::cout << matrix.elements.at(matrix.nRows * rowIdx + colIdx) << ' ';
+			std::cout << matrix.elements.at(rowIdx * matrix.nCols + colIdx) << ' ';
 		}
 		std::cout << std::endl;
 	}
@@ -221,7 +221,7 @@ bool Matrix::checkMultiplicationOverflow(const T& numWithLargerDatatype, const U
 }
 
 // explicit instantiations for templates
-#ifdef USE_INT_MATRIX
+#ifdef USE_S_INT_MATRIX
 template Matrix::MatrixStruct<int> Matrix::createMatrix<int>(const std::size_t&, const std::size_t&);
 template Matrix::MatrixStruct<int> Matrix::createMatrix<int>(const std::size_t&, const std::size_t&, const std::vector<int>&);
 template Matrix::MatrixStruct<int> Matrix::createMatrix<int>(const std::size_t&, const std::size_t&, const std::initializer_list<int>&);
@@ -239,7 +239,7 @@ template bool Matrix::checkAdditionOverflow(const int&, const int&);
 template bool Matrix::checkMultiplicationOverflow(const int&, const int&);
 #endif
 
-#ifdef USE_UINT_MATRIX
+#ifdef USE_U_INT_MATRIX
 template Matrix::MatrixStruct<unsigned int> Matrix::createMatrix<unsigned int>(const std::size_t&, const std::size_t&);
 template Matrix::MatrixStruct<unsigned int> Matrix::createMatrix<unsigned int>(const std::size_t&, const std::size_t&, const std::vector<unsigned int>&);
 template Matrix::MatrixStruct<unsigned int> Matrix::createMatrix<unsigned int>(const std::size_t&, const std::size_t&, const std::initializer_list<unsigned int>&);
