@@ -210,6 +210,20 @@ Matrix::MatrixStruct<T> Matrix::convoluteMatrixUsingKernel(
 }
 
 template <typename T>
+Matrix::MatrixStruct<T> Matrix::transposeMatrix(const Matrix::MatrixStruct<T>& matrix) {
+	Matrix::MatrixStruct<T> transposed = Matrix::createMatrix<T>(matrix.nCols, matrix.nRows);
+	size_t origIdx, transIdx;
+	for (size_t rowIdx = 0; rowIdx < matrix.nRows; ++rowIdx) {
+		for (size_t colIdx = 0; colIdx < matrix.nCols; ++colIdx) {
+			origIdx = rowIdx * matrix.nCols + colIdx;
+			transIdx = colIdx * transposed.nCols + rowIdx;
+			transposed.elements.at(transIdx) = matrix.elements.at(origIdx);
+		}
+	}
+	return transposed;
+}
+
+template <typename T>
 void Matrix::dumpMatrixInfo(const Matrix::MatrixStruct<T>& matrix) {
 	for (size_t rowIdx = 0; rowIdx < matrix.nRows; ++rowIdx) {
 		for (size_t colIdx = 0; colIdx < matrix.nCols; ++colIdx) {
@@ -278,6 +292,7 @@ template std::vector<int> Matrix::getRow(const Matrix::MatrixStruct<int>&, const
 template std::vector<int> Matrix::getCol(const Matrix::MatrixStruct<int>&, const size_t&);
 
 template Matrix::MatrixStruct<int> Matrix::convoluteMatrixUsingKernel(const Matrix::MatrixStruct<int>&, const Matrix::MatrixStruct<int>&);
+template Matrix::MatrixStruct<int> Matrix::transposeMatrix(const Matrix::MatrixStruct<int>&);
 
 template int& Matrix::MatrixStruct<int>::operator () (const size_t& rowIdx, const size_t& colIdx) const;
 template Matrix::MatrixStruct<int> Matrix::MatrixStruct<int>::operator + (const Matrix::MatrixStruct<int>& rhs) const;
@@ -300,6 +315,7 @@ template std::vector<unsigned int> Matrix::getRow(const Matrix::MatrixStruct<uns
 template std::vector<unsigned int> Matrix::getCol(const Matrix::MatrixStruct<unsigned int>&, const size_t&);
 
 template Matrix::MatrixStruct<unsigned int> Matrix::convoluteMatrixUsingKernel(const Matrix::MatrixStruct<unsigned int>&, const Matrix::MatrixStruct<unsigned int>&);
+template Matrix::MatrixStruct<unsigned int> Matrix::transposeMatrix(const Matrix::MatrixStruct<unsigned int>&);
 
 template unsigned int& Matrix::MatrixStruct<unsigned int>::operator () (const size_t& rowIdx, const size_t& colIdx) const;
 template Matrix::MatrixStruct<unsigned int> Matrix::MatrixStruct<unsigned int>::operator + (const Matrix::MatrixStruct<unsigned int>& rhs) const;
@@ -322,6 +338,7 @@ template std::vector<unsigned char> Matrix::getRow(const Matrix::MatrixStruct<un
 template std::vector<unsigned char> Matrix::getCol(const Matrix::MatrixStruct<unsigned char>&, const size_t&);
 
 template Matrix::MatrixStruct<unsigned char> Matrix::convoluteMatrixUsingKernel(const Matrix::MatrixStruct<unsigned char>&, const Matrix::MatrixStruct<unsigned char>&);
+template Matrix::MatrixStruct<unsigned char> Matrix::transposeMatrix(const Matrix::MatrixStruct<unsigned char>&);
 
 template unsigned char& Matrix::MatrixStruct<unsigned char>::operator () (const size_t& rowIdx, const size_t& colIdx) const;
 template Matrix::MatrixStruct<unsigned char> Matrix::MatrixStruct<unsigned char>::operator + (const Matrix::MatrixStruct<unsigned char>& rhs) const;

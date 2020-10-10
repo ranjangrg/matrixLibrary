@@ -58,6 +58,9 @@ namespace Matrix {
 	MatrixStruct<T> convoluteMatrixUsingKernel(
 		const MatrixStruct<T>& mainMatrix,
 		const MatrixStruct<U>& kernelMatrix);
+		
+	template <typename T>
+	MatrixStruct<T> transposeMatrix(const MatrixStruct<T>& matrix);
 
 	template <typename T>
 	void dumpMatrixInfo(const MatrixStruct<T>& matrix);

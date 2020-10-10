@@ -256,35 +256,29 @@ std::unordered_map<std::string, bool> testMatrixConvolution() {
 
 std::unordered_map<std::string, bool> testMatrixMethods() {
 	std::unordered_map<std::string, bool> testResults = {
-		{"using Matrix method: dot product", false}
+		{"using Matrix method: transpose", false}
 	};
+	Matrix::MatrixStruct<int> matA  = Matrix::createMatrix<int>(2, 3, 
+		{
+			1,2,3,
+			4,5,6
+		});		
+	Matrix::MatrixStruct<int> transposedCorrect = Matrix::createMatrix<int>(3, 2, 
+		{
+			1,4,
+			2,5,
+			3,6
+		});
 
 	try {
-		Matrix::MatrixStruct<int> matA  = Matrix::createMatrix<int>(2, 3, 
-			{
-				1,2,3,
-				4,5,6
-			});		
-		Matrix::MatrixStruct<int> matB  = Matrix::createMatrix<int>(3, 2, 
-			{
-				7,8,
-				9,10,
-				11,12
-			});
-		Matrix::MatrixStruct<int> matC  = Matrix::createMatrix<int>(2, 3, 
-			{
-				2,5,1,
-				4,0,7
-			});
-
-		Matrix::dumpMatrixInfo(matA);
-		std::cout << '-' << std::endl;
-		Matrix::dumpMatrixInfo(matB);
-
-		testResults["using Matrix method: dot product"] = true;
+		Matrix::MatrixStruct<int> transposed = Matrix::transposeMatrix(matA);
+		testResults["using Matrix method: transpose"] = true;
+		for (size_t idx = 0; (idx < transposed.elements.size()) && testResults["using Matrix method: transpose"]; ++idx) {
+			testResults["using Matrix method: transpose"] = transposed.elements.at(idx) == transposedCorrect.elements.at(idx);
+		}
 	} catch (std::exception& e) {
 		//std::cout << e.what() << std::endl;	
-		//testResults["using Matrix method: dot product"] = true;
+		testResults["using Matrix method: transpose"] = false;
 	}
 
 	return testResults;
@@ -307,11 +301,8 @@ void testAll() {
 	printResults(testResults);
 	testResults = testMatrixConvolution();
 	printResults(testResults);
-
-	/*
 	testResults = testMatrixMethods();
 	printResults(testResults);
-	*/
 	
 }
 
