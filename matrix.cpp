@@ -2,7 +2,6 @@
 
 template <typename T>
 T& Matrix::MatrixStruct<T>::operator () (const size_t& rowIdx, const size_t& colIdx) const {
-	//std::cout << "Operator method: ().\n";
 	T value = this->elements.at(rowIdx * this->nCols + colIdx);
 	T& valueRef = value;
 	return valueRef;
@@ -10,7 +9,6 @@ T& Matrix::MatrixStruct<T>::operator () (const size_t& rowIdx, const size_t& col
 
 template <typename T>
 Matrix::MatrixStruct<T> Matrix::MatrixStruct<T>::operator + (const Matrix::MatrixStruct<T>& rhsMatrix) const {
-	//std::cout << "Operator method: +.\n";
 	const Matrix::MatrixStruct<T>* lhs = this;
 	const Matrix::MatrixStruct<T>* rhs = &rhsMatrix;
 	if ( (lhs->nCols != rhs->nCols) || (lhs->nRows != rhs->nRows) ) {
@@ -29,7 +27,6 @@ Matrix::MatrixStruct<T> Matrix::MatrixStruct<T>::operator + (const Matrix::Matri
 
 template <typename T>
 Matrix::MatrixStruct<T> Matrix::MatrixStruct<T>::operator - (const Matrix::MatrixStruct<T>& rhsMatrix) const {
-	//std::cout << "Operator method: -.\n";
 	const Matrix::MatrixStruct<T>* lhs = this;
 	const Matrix::MatrixStruct<T>* rhs = &rhsMatrix;
 	if ( (lhs->nCols != rhs->nCols) || (lhs->nRows != rhs->nRows) ) {
@@ -48,7 +45,6 @@ Matrix::MatrixStruct<T> Matrix::MatrixStruct<T>::operator - (const Matrix::Matri
 
 template <typename T>
 Matrix::MatrixStruct<T> Matrix::MatrixStruct<T>::operator * (const T& scalar) const {
-	//std::cout << "Operator method: -.\n";
 	const Matrix::MatrixStruct<T>* lhs = this;
 	Matrix::MatrixStruct<T> resultMatrix = Matrix::createMatrix<T>(this->nRows, this->nRows);
 	for (size_t idx = 0; idx < resultMatrix.elements.size(); ++idx) {
@@ -60,8 +56,43 @@ Matrix::MatrixStruct<T> Matrix::MatrixStruct<T>::operator * (const T& scalar) co
 }
 
 template <typename T>
+Matrix::MatrixStruct<T> Matrix::MatrixStruct<T>::operator * (const Matrix::MatrixStruct<T>& rhsMatrix) const {
+	const Matrix::MatrixStruct<T>* lhsMatrix = this;
+	// check if matrices can actually multiply with each other i.e. (m x n) x (n x p)
+	if ( lhsMatrix->nCols != rhsMatrix.nRows ) {
+		throw Exception::dimensionMismatchForMultiplicationException();
+	}
+	Matrix::MatrixStruct<T> resultMatrix = Matrix::createMatrix<T>(lhsMatrix->nRows, rhsMatrix.nCols);
+	T value;
+	std::vector<T> currRow, currCol;
+
+	for (size_t resultRowIdx = 0; resultRowIdx < resultMatrix.nRows; ++resultRowIdx) {
+		for (size_t resultColIdx = 0; resultColIdx < resultMatrix.nCols; ++resultColIdx) { 
+			value = T();
+			currRow = getRow(*lhsMatrix, resultRowIdx);
+			currCol = getCol(rhsMatrix, resultColIdx);
+			// calculate dot product of lhs's resultRowIdx row and rhs's resultColIdx col
+			for (size_t currIdx = 0; currIdx < currRow.size(); ++currIdx) {
+				// check for possible overflows:
+				// overflow check for (currRow.at(currIdx) * currCol.at(currIdx)) AND/OR
+				// overflow check for (value + (currRow.at(currIdx) * currCol.at(currIdx))): addition
+				if ( Matrix::checkMultiplicationOverflow(currRow.at(currIdx), currCol.at(currIdx)) ) {
+					throw Matrix::Exception::dataOverflowDuringMultiplicationException();
+				}
+				if ( Matrix::checkAdditionOverflow(value, (currRow.at(currIdx) * currCol.at(currIdx))) ) {
+					throw Matrix::Exception::dataOverflowDuringAdditionException();
+				}
+				value += currRow.at(currIdx) * currCol.at(currIdx);
+			}
+			resultMatrix.elements.at(resultRowIdx * resultMatrix.nCols + resultColIdx) = value;
+		}
+	}
+
+	return resultMatrix;
+}
+
+template <typename T>
 bool Matrix::MatrixStruct<T>::operator == (const Matrix::MatrixStruct<T>& rhsMatrix) const {
-	//std::cout << "Operator method: ==.\n";
 	bool areSame = false;
 	const Matrix::MatrixStruct<T>* lhs = this;
 	const Matrix::MatrixStruct<T>* rhs = &rhsMatrix;
@@ -112,6 +143,23 @@ Matrix::MatrixStruct<T> Matrix::createMatrix(
 	std::vector<T> elementsAsVector = elements;
 	matrix = Matrix::createMatrix<T>(nRows, nCols, elementsAsVector);
 	return matrix;
+}
+
+template <typename T>
+std::vector<T> Matrix::getRow(const Matrix::MatrixStruct<T>& matrix, const size_t& rowIdx) {
+	size_t startIdxOffset = rowIdx * matrix.nCols;
+	size_t endIdxOffset = startIdxOffset + matrix.nCols;
+	std::vector<T> row(matrix.elements.begin() + startIdxOffset, matrix.elements.begin() + endIdxOffset);
+	return row;
+}
+
+template <typename T>
+std::vector<T> Matrix::getCol(const Matrix::MatrixStruct<T>& matrix, const size_t& colIdx) {
+	std::vector<T> col(matrix.nRows);
+	for (size_t rowIdx = 0; rowIdx < matrix.nRows; ++rowIdx) {
+		col.at(rowIdx) = matrix.elements.at(rowIdx * matrix.nCols + colIdx);
+	}
+	return col;
 }
 
 template <typename T, typename U>
@@ -226,12 +274,16 @@ template Matrix::MatrixStruct<int> Matrix::createMatrix<int>(const std::size_t&,
 template Matrix::MatrixStruct<int> Matrix::createMatrix<int>(const std::size_t&, const std::size_t&, const std::vector<int>&);
 template Matrix::MatrixStruct<int> Matrix::createMatrix<int>(const std::size_t&, const std::size_t&, const std::initializer_list<int>&);
 
+template std::vector<int> Matrix::getRow(const Matrix::MatrixStruct<int>&, const size_t&);
+template std::vector<int> Matrix::getCol(const Matrix::MatrixStruct<int>&, const size_t&);
+
 template Matrix::MatrixStruct<int> Matrix::convoluteMatrixUsingKernel(const Matrix::MatrixStruct<int>&, const Matrix::MatrixStruct<int>&);
 
 template int& Matrix::MatrixStruct<int>::operator () (const size_t& rowIdx, const size_t& colIdx) const;
 template Matrix::MatrixStruct<int> Matrix::MatrixStruct<int>::operator + (const Matrix::MatrixStruct<int>& rhs) const;
 template Matrix::MatrixStruct<int> Matrix::MatrixStruct<int>::operator - (const Matrix::MatrixStruct<int>& rhs) const;
 template Matrix::MatrixStruct<int> Matrix::MatrixStruct<int>::operator * (const int& scalar) const;
+template Matrix::MatrixStruct<int> Matrix::MatrixStruct<int>::operator * (const Matrix::MatrixStruct<int>& rhs) const;
 template bool Matrix::MatrixStruct<int>::operator == (const Matrix::MatrixStruct<int>& rhs) const;
 
 template void Matrix::dumpMatrixInfo<int>(const Matrix::MatrixStruct<int>&);
@@ -244,12 +296,16 @@ template Matrix::MatrixStruct<unsigned int> Matrix::createMatrix<unsigned int>(c
 template Matrix::MatrixStruct<unsigned int> Matrix::createMatrix<unsigned int>(const std::size_t&, const std::size_t&, const std::vector<unsigned int>&);
 template Matrix::MatrixStruct<unsigned int> Matrix::createMatrix<unsigned int>(const std::size_t&, const std::size_t&, const std::initializer_list<unsigned int>&);
 
+template std::vector<unsigned int> Matrix::getRow(const Matrix::MatrixStruct<unsigned int>&, const size_t&);
+template std::vector<unsigned int> Matrix::getCol(const Matrix::MatrixStruct<unsigned int>&, const size_t&);
+
 template Matrix::MatrixStruct<unsigned int> Matrix::convoluteMatrixUsingKernel(const Matrix::MatrixStruct<unsigned int>&, const Matrix::MatrixStruct<unsigned int>&);
 
 template unsigned int& Matrix::MatrixStruct<unsigned int>::operator () (const size_t& rowIdx, const size_t& colIdx) const;
 template Matrix::MatrixStruct<unsigned int> Matrix::MatrixStruct<unsigned int>::operator + (const Matrix::MatrixStruct<unsigned int>& rhs) const;
 template Matrix::MatrixStruct<unsigned int> Matrix::MatrixStruct<unsigned int>::operator - (const Matrix::MatrixStruct<unsigned int>& rhs) const;
 template Matrix::MatrixStruct<unsigned int> Matrix::MatrixStruct<unsigned int>::operator * (const unsigned int& scalar) const;
+template Matrix::MatrixStruct<unsigned int> Matrix::MatrixStruct<unsigned int>::operator * (const Matrix::MatrixStruct<unsigned int>& rhs) const;
 template bool Matrix::MatrixStruct<unsigned int>::operator == (const Matrix::MatrixStruct<unsigned int>& rhs) const;
 
 template void Matrix::dumpMatrixInfo<unsigned int>(const Matrix::MatrixStruct<unsigned int>&);
@@ -262,12 +318,16 @@ template Matrix::MatrixStruct<unsigned char> Matrix::createMatrix<unsigned char>
 template Matrix::MatrixStruct<unsigned char> Matrix::createMatrix<unsigned char>(const std::size_t&, const std::size_t&, const std::vector<unsigned char>&);
 template Matrix::MatrixStruct<unsigned char> Matrix::createMatrix<unsigned char>(const std::size_t&, const std::size_t&, const std::initializer_list<unsigned char>&);
 
+template std::vector<unsigned char> Matrix::getRow(const Matrix::MatrixStruct<unsigned char>&, const size_t&);
+template std::vector<unsigned char> Matrix::getCol(const Matrix::MatrixStruct<unsigned char>&, const size_t&);
+
 template Matrix::MatrixStruct<unsigned char> Matrix::convoluteMatrixUsingKernel(const Matrix::MatrixStruct<unsigned char>&, const Matrix::MatrixStruct<unsigned char>&);
 
 template unsigned char& Matrix::MatrixStruct<unsigned char>::operator () (const size_t& rowIdx, const size_t& colIdx) const;
 template Matrix::MatrixStruct<unsigned char> Matrix::MatrixStruct<unsigned char>::operator + (const Matrix::MatrixStruct<unsigned char>& rhs) const;
 template Matrix::MatrixStruct<unsigned char> Matrix::MatrixStruct<unsigned char>::operator - (const Matrix::MatrixStruct<unsigned char>& rhs) const;
 template Matrix::MatrixStruct<unsigned char> Matrix::MatrixStruct<unsigned char>::operator * (const unsigned char& scalar) const;
+template Matrix::MatrixStruct<unsigned char> Matrix::MatrixStruct<unsigned char>::operator * (const Matrix::MatrixStruct<unsigned char>& rhs) const;
 template bool Matrix::MatrixStruct<unsigned char>::operator == (const Matrix::MatrixStruct<unsigned char>& rhs) const;
 
 template void Matrix::dumpMatrixInfo<unsigned char>(const Matrix::MatrixStruct<unsigned char>&);

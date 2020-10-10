@@ -23,6 +23,7 @@ namespace Matrix {
 		MatrixStruct<T> operator + (const MatrixStruct<T>& rhs) const;
 		MatrixStruct<T> operator - (const MatrixStruct<T>& rhs) const;
 		MatrixStruct<T> operator * (const T& scalar) const;
+		MatrixStruct<T> operator * (const MatrixStruct<T>& rhs) const;
 		bool operator == (const MatrixStruct<T>& rhs) const;
 	};
 
@@ -46,6 +47,12 @@ namespace Matrix {
 		const std::size_t& nRows, 
 		const std::size_t& nCols, 
 		const std::initializer_list<T>& elements);
+
+	// getter methods
+	template <typename T>
+	std::vector<T> getRow(const MatrixStruct<T>& matrix, const size_t& rowIdx);
+	template <typename T>
+	std::vector<T> getCol(const MatrixStruct<T>& matrix, const size_t& colIdx);
 
 	template <typename T, typename U>
 	MatrixStruct<T> convoluteMatrixUsingKernel(
@@ -87,9 +94,9 @@ namespace Matrix {
 				return "[ERR] [Matrix] Data value overflow/underflow detected during multiplication.";
 			}
 		};
-		struct dimensionMismatchForDotProductException : public std::exception {
+		struct dimensionMismatchForMultiplicationException : public std::exception {
 			const char* what() const throw () {
-				return "[ERR] [Matrix] Matrix dimensions not suitable for calculating dot product.";
+				return "[ERR] [Matrix] Matrix dimensions not suitable for multiplication.";
 			}
 		};
 	}

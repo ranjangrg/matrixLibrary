@@ -54,7 +54,8 @@ std::unordered_map<std::string, bool> testMatrixOperators() {
 		{"using  -: Negative case", false},
 		{"using ==: Positive case", false},
 		{"using ==: Negative case", false},
-		{"using  *: Positive case", false}
+		{"using  *: with Scalar", false},
+		{"using  *: with another matrix", false}
 		//{"using  *: Negative case", false}
 	};
 
@@ -140,17 +141,40 @@ std::unordered_map<std::string, bool> testMatrixOperators() {
 		testResults["using ==: Negative case"] = false;
 	}
 
-	// test: using * : PASS
+	// test: using * : scalar
 	try {
-		Matrix::MatrixStruct<int> matProdCorrect = Matrix::createMatrix<int>(2, 2, {90,50,40,-10});
-		Matrix::MatrixStruct<int> matProd = matC * 10;
-		testResults["using  *: Positive case"] = true;
-		for (size_t idx = 0; (idx < matProd.elements.size()) && testResults["using  *: Positive case"]; ++idx) {
-			testResults["using  *: Positive case"] = matProd.elements.at(idx) == matProdCorrect.elements.at(idx);
+		Matrix::MatrixStruct<int> matProdCorrectA = Matrix::createMatrix<int>(2, 2, {90,50,40,-10});
+		Matrix::MatrixStruct<int> matProdA = matC * 10;
+		testResults["using  *: with Scalar"] = true;
+		for (size_t idx = 0; (idx < matProdA.elements.size()) && testResults["using  *: with Scalar"]; ++idx) {
+			testResults["using  *: with Scalar"] = matProdA.elements.at(idx) == matProdCorrectA.elements.at(idx);
 		}
 	} catch (std::exception& e) {
 		//std::cout << e.what() << std::endl;	
-		testResults["using  *: Positive case"] = false;
+		testResults["using  *: with Scalar"] = false;
+	}
+
+	// test: using * : with matrix
+	try {
+		Matrix::MatrixStruct<int> matH  = Matrix::createMatrix<int>(2, 3, {1,0,-3,-2,4,1});
+		Matrix::MatrixStruct<int> matI  = Matrix::createMatrix<int>(3, 4, {
+			1,0,4,1,
+			-2,3,-1,5,
+			0,-1,2,1
+		});
+		Matrix::MatrixStruct<int> matProdCorrectB = Matrix::createMatrix<int>(2, 4, {
+			1,3,-2,-2,
+			-10,11,-10,19
+		});
+		Matrix::MatrixStruct<int> matProdB = matH * matI;
+
+		testResults["using  *: with another matrix"] = true;
+		for (size_t idx = 0; (idx < matProdB.elements.size()) && testResults["using  *: with another matrix"]; ++idx) {
+			testResults["using  *: with another matrix"] = matProdB.elements.at(idx) == matProdCorrectB.elements.at(idx);
+		}
+	} catch (std::exception& e) {
+		//std::cout << e.what() << std::endl;	
+		testResults["using  *: with another matrix"] = false;
 	}
 
 	return testResults;
@@ -192,7 +216,6 @@ std::unordered_map<std::string, bool> testMatrixConvolution() {
 		for (size_t idx = 0; (idx < convolutedMatrix.elements.size()) && testResults["using Convolution method"]; ++idx) {
 			testResults["using Convolution method"] = convolutedMatrix.elements.at(idx) == convolutedMatrixCorrect.elements.at(idx);
 		}
-		//Matrix::dumpMatrixInfo(convolutedMatrix);
 	} catch (std::exception& e) {
 		//std::cout << e.what() << std::endl;	
 		testResults["using Convolution method"] = false;
