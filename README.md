@@ -10,7 +10,7 @@ For each datatype, enable the following:
 ```
 Example, for a Matrix holding `unsigned char` type data, enable `#define USE_U_CHAR_MATRIX`.
 
-Use namespace `Matrix::" to access all the methods and struct.
+Use namespace `Matrix::` to access all the methods and struct.
 
 ## MatrixStruct
 A typical MatrixStruct has following definition.
