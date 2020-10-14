@@ -167,6 +167,10 @@ Matrix::MatrixStruct<T> Matrix::convoluteMatrixUsingKernel(
 	const Matrix::MatrixStruct<T>& mainMatrix,
 	const Matrix::MatrixStruct<U>& kernelMatrix
 	) {
+	// TODO: Important: Implement additional parameter to
+	// disable overflow detection (instead of throwing exception)
+	// This can be done by having additional parameter e.g.
+	// ignoreOverflow, and set it to have default value set to false in header
 	Matrix::MatrixStruct<T> resultantMatrix = Matrix::createMatrix<T>(mainMatrix.nRows, mainMatrix.nCols);
 	// variable declarations
 	T value, valueAtMat, valueAtKernel;
