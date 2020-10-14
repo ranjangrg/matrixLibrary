@@ -11,6 +11,11 @@ For each datatype, enable the following:
 Example, for a Matrix holding `unsigned char` type data, enable `#define USE_U_CHAR_MATRIX`.
 
 Use namespace `Matrix::` to access all the methods and struct.
+Make sure `matrix.cpp` has access to `matrix.hpp` via `include` path within `matrix.cpp`.
+And also, compile `matrix.cpp` while compiling your project. Example:
+```bash
+g++ --std=c++14 matrix.cpp myfile.cpp -g -o exec;
+```
 
 ## MatrixStruct
 A typical MatrixStruct has following definition.
