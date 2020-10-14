@@ -2,6 +2,7 @@
 #define __MATRIX_H
 
 #include <iostream>
+#include <iomanip>	// for setw()
 #include <vector>
 #include <exception>
 #include <initializer_list>
@@ -63,7 +64,7 @@ namespace Matrix {
 	MatrixStruct<T> transposeMatrix(const MatrixStruct<T>& matrix);
 
 	template <typename T>
-	void dumpMatrixInfo(const MatrixStruct<T>& matrix);
+	void dumpMatrixInfo(const MatrixStruct<T>& matrix, const size_t& printWidth = 3, const bool& castToInt = false);
 
 	// overflow check for (num1 + num2); 
 	// num1's data type must have larger max/min limit than num2

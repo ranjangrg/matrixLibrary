@@ -224,10 +224,14 @@ Matrix::MatrixStruct<T> Matrix::transposeMatrix(const Matrix::MatrixStruct<T>& m
 }
 
 template <typename T>
-void Matrix::dumpMatrixInfo(const Matrix::MatrixStruct<T>& matrix) {
+void Matrix::dumpMatrixInfo(const Matrix::MatrixStruct<T>& matrix, const size_t& printWidth, const bool& castToInt) {
 	for (size_t rowIdx = 0; rowIdx < matrix.nRows; ++rowIdx) {
 		for (size_t colIdx = 0; colIdx < matrix.nCols; ++colIdx) {
-			std::cout << matrix.elements.at(rowIdx * matrix.nCols + colIdx) << ' ';
+			if (castToInt) {
+				std::cout << std::setw(printWidth) << int(matrix.elements.at(rowIdx * matrix.nCols + colIdx)) << ' ';
+			} else {
+				std::cout << std::setw(printWidth) << matrix.elements.at(rowIdx * matrix.nCols + colIdx) << ' ';
+			}
 		}
 		std::cout << std::endl;
 	}
@@ -301,7 +305,7 @@ template Matrix::MatrixStruct<int> Matrix::MatrixStruct<int>::operator * (const 
 template Matrix::MatrixStruct<int> Matrix::MatrixStruct<int>::operator * (const Matrix::MatrixStruct<int>& rhs) const;
 template bool Matrix::MatrixStruct<int>::operator == (const Matrix::MatrixStruct<int>& rhs) const;
 
-template void Matrix::dumpMatrixInfo<int>(const Matrix::MatrixStruct<int>&);
+template void Matrix::dumpMatrixInfo<int>(const Matrix::MatrixStruct<int>&, const size_t&, const bool&);
 template bool Matrix::checkAdditionOverflow(const int&, const int&);
 template bool Matrix::checkMultiplicationOverflow(const int&, const int&);
 #endif
@@ -324,7 +328,7 @@ template Matrix::MatrixStruct<unsigned int> Matrix::MatrixStruct<unsigned int>::
 template Matrix::MatrixStruct<unsigned int> Matrix::MatrixStruct<unsigned int>::operator * (const Matrix::MatrixStruct<unsigned int>& rhs) const;
 template bool Matrix::MatrixStruct<unsigned int>::operator == (const Matrix::MatrixStruct<unsigned int>& rhs) const;
 
-template void Matrix::dumpMatrixInfo<unsigned int>(const Matrix::MatrixStruct<unsigned int>&);
+template void Matrix::dumpMatrixInfo<unsigned int>(const Matrix::MatrixStruct<unsigned int>&, const size_t&, const bool&);
 template bool Matrix::checkAdditionOverflow(const unsigned int&, const unsigned int&);
 template bool Matrix::checkMultiplicationOverflow(const unsigned int&, const unsigned int&);
 #endif
@@ -347,7 +351,7 @@ template Matrix::MatrixStruct<unsigned char> Matrix::MatrixStruct<unsigned char>
 template Matrix::MatrixStruct<unsigned char> Matrix::MatrixStruct<unsigned char>::operator * (const Matrix::MatrixStruct<unsigned char>& rhs) const;
 template bool Matrix::MatrixStruct<unsigned char>::operator == (const Matrix::MatrixStruct<unsigned char>& rhs) const;
 
-template void Matrix::dumpMatrixInfo<unsigned char>(const Matrix::MatrixStruct<unsigned char>&);
+template void Matrix::dumpMatrixInfo<unsigned char>(const Matrix::MatrixStruct<unsigned char>&, const size_t&, const bool&);
 template bool Matrix::checkAdditionOverflow(const unsigned char&, const unsigned char&);
 template bool Matrix::checkMultiplicationOverflow(const unsigned char&, const unsigned char&);
 #endif
