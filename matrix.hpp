@@ -20,7 +20,8 @@ namespace Matrix {
 		std::vector<T> elements;
 
 		// operator symbol overload/overriding
-		T& operator () (const size_t& rowIdx, const size_t& colIdx) const;
+		T& operator () (const size_t& rowIdx, const size_t& colIdx);
+		T operator () (const size_t& rowIdx, const size_t& colIdx) const;
 		MatrixStruct<T> operator + (const MatrixStruct<T>& rhs) const;
 		MatrixStruct<T> operator - (const MatrixStruct<T>& rhs) const;
 		MatrixStruct<T> operator * (const T& scalar) const;

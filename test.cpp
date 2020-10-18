@@ -1,5 +1,13 @@
 #include "./test.hpp"
 
+bool logError = false;
+
+void logException(std::exception& e) { 
+	if (logError) {
+		std::cout << e.what() << std::endl; 
+	}
+}
+
 std::unordered_map<std::string, bool> testMatrixConstructors() {
 	std::unordered_map<std::string, bool> testResults = {
 		{"usingRowColCount", false},
@@ -12,25 +20,21 @@ std::unordered_map<std::string, bool> testMatrixConstructors() {
 	try {
 		Matrix::MatrixStruct<int> matA  = Matrix::createMatrix<int>(3, 5);
 		testResults["usingRowColCount"] = true;
-	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;		
-	}
+	} catch (std::exception& e) { logException(e); }
 
 	// test: usingVector
 	try {
 		std::vector<int> elems = {1,2,3,4,5,6,7,8,0};
 		Matrix::MatrixStruct<int> matB  = Matrix::createMatrix<int>(3, 3, elems);
 		testResults["usingVector"] = true;
-	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;		
-	}
+	} catch (std::exception& e) { logException(e); }
+
 	try {
 		// should fail
 		std::vector<int> elems = {1,2,3,4,5,6,7,8,0};
 		Matrix::MatrixStruct<int> matC  = Matrix::createMatrix<int>(3, 4, elems);
 		testResults["usingVector"] = false;
 	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;	
 		testResults["usingVector"] = true;
 	}
 
@@ -39,7 +43,7 @@ std::unordered_map<std::string, bool> testMatrixConstructors() {
 		Matrix::MatrixStruct<int> matD  = Matrix::createMatrix<int>(3, 3, {1,2,3,4,5,6,7,8,0});
 		testResults["usingInitializerList"] = true;
 	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;
+		logException(e);
 	}
 
 	return testResults;
@@ -47,7 +51,8 @@ std::unordered_map<std::string, bool> testMatrixConstructors() {
 
 std::unordered_map<std::string, bool> testMatrixOperators() {
 	std::unordered_map<std::string, bool> testResults = {
-		{"using (): Positive case", false},
+		{"using (): get case", false},
+		{"using (): set case", false},
 		{"using  +: Positive case", false},
 		{"using  +: Negative case", false},
 		{"using  -: Positive case", false},
@@ -56,7 +61,6 @@ std::unordered_map<std::string, bool> testMatrixOperators() {
 		{"using ==: Negative case", false},
 		{"using  *: with Scalar", false},
 		{"using  *: with another matrix", false}
-		//{"using  *: Negative case", false}
 	};
 
 	// matrices for test; suppose constructors work
@@ -68,16 +72,35 @@ std::unordered_map<std::string, bool> testMatrixOperators() {
 	Matrix::MatrixStruct<int> matF  = Matrix::createMatrix<int>(2, 2, {1,2,3,4});
 	Matrix::MatrixStruct<int> matG  = Matrix::createMatrix<int>(2, 2, {10,20,30,40});
 
-	// test: usingBrackets: PASS
+	// test: usingBrackets: get
 	try {
 		for (size_t rowIdx = 0; rowIdx < matA.nRows; ++rowIdx) {
 			for (size_t colIdx = 0; colIdx < matA.nCols; ++colIdx) {
 				matA(rowIdx, colIdx);
 			}
 		}		
-		testResults["using (): Positive case"] = true;
+		testResults["using (): get case"] = true;
 	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;		
+		logException(e);		
+	}
+
+	// test: usingBrackets: set
+	int newValue = 128;
+	try {
+		for (size_t rowIdx = 0; rowIdx < matA.nRows; ++rowIdx) {
+			for (size_t colIdx = 0; colIdx < matA.nCols; ++colIdx) {
+				matA(rowIdx, colIdx) = newValue;
+			}
+		}
+		bool setSuccess = true;
+		for (size_t rowIdx = 0; (rowIdx < matA.nRows) && (setSuccess); ++rowIdx) {
+			for (size_t colIdx = 0; colIdx < matA.nCols; ++colIdx) {
+				setSuccess = matA(rowIdx, colIdx) == newValue;
+			}
+		}
+		testResults["using (): set case"] = setSuccess;
+	} catch (std::exception& e) {
+		logException(e);	
 	}
 
 	// test: using + : PASS
@@ -85,7 +108,7 @@ std::unordered_map<std::string, bool> testMatrixOperators() {
 		matA + matB;
 		testResults["using  +: Positive case"] = true;
 	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;		
+		logException(e);	
 	}
 	try {
 		Matrix::MatrixStruct<int> matSumCorrect  = Matrix::createMatrix<int>(2, 2, {11,22,33,44});
@@ -94,14 +117,13 @@ std::unordered_map<std::string, bool> testMatrixOperators() {
 			testResults["using  +: Positive case"] = matSumA.elements.at(idx) == matSumCorrect.elements.at(idx);
 		}
 	} catch (std::exception& e) {
-		std::cout << e.what() << std::endl;	
+		logException(e);
 	}
 
 	// test: using + : FAIL
 	try {
 		Matrix::MatrixStruct<int> matSumB = matA + matE;
 	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;	
 		testResults["using  +: Negative case"] = true;
 	}
 
@@ -113,14 +135,13 @@ std::unordered_map<std::string, bool> testMatrixOperators() {
 			testResults["using  -: Positive case"] = matDiff.elements.at(idx) == matDiffCorrect.elements.at(idx);
 		}
 	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;	
+		logException(e);
 		testResults["using  -: Positive case"] = false;
 	}
 	// test: using - : FAIL
 	try {
 		matA - matE;
 	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;	
 		testResults["using  -: Negative case"] = true;
 	}
 
@@ -129,7 +150,7 @@ std::unordered_map<std::string, bool> testMatrixOperators() {
 		bool areSame = (matA == matB) && (matC == matD);
 		testResults["using ==: Positive case"] = areSame ? true : false;
 	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;	
+		logException(e);
 		testResults["using ==: Positive case"] = false;
 	}
 	// test: using == : FAIL
@@ -137,7 +158,7 @@ std::unordered_map<std::string, bool> testMatrixOperators() {
 		bool areSame = (matA == matE) && (matF == matG);
 		testResults["using ==: Negative case"] = areSame ? false : true;
 	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;	
+		logException(e);	
 		testResults["using ==: Negative case"] = false;
 	}
 
@@ -150,7 +171,7 @@ std::unordered_map<std::string, bool> testMatrixOperators() {
 			testResults["using  *: with Scalar"] = matProdA.elements.at(idx) == matProdCorrectA.elements.at(idx);
 		}
 	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;	
+		logException(e);
 		testResults["using  *: with Scalar"] = false;
 	}
 
@@ -173,7 +194,7 @@ std::unordered_map<std::string, bool> testMatrixOperators() {
 			testResults["using  *: with another matrix"] = matProdB.elements.at(idx) == matProdCorrectB.elements.at(idx);
 		}
 	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;	
+		logException(e);	
 		testResults["using  *: with another matrix"] = false;
 	}
 
@@ -217,7 +238,7 @@ std::unordered_map<std::string, bool> testMatrixConvolution() {
 			testResults["using Convolution method"] = convolutedMatrix.elements.at(idx) == convolutedMatrixCorrect.elements.at(idx);
 		}
 	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;	
+		logException(e);
 		testResults["using Convolution method"] = false;
 	}
 
@@ -247,7 +268,6 @@ std::unordered_map<std::string, bool> testMatrixConvolution() {
 			});
 		Matrix::MatrixStruct<signed int> convolutedMatrix = Matrix::convoluteMatrixUsingKernel(mainMatrix, kernelMatrix);
 	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;	
 		testResults["test Convolution overflow"] = true;
 	}
 
@@ -277,7 +297,7 @@ std::unordered_map<std::string, bool> testMatrixMethods() {
 			testResults["using Matrix method: transpose"] = transposed.elements.at(idx) == transposedCorrect.elements.at(idx);
 		}
 	} catch (std::exception& e) {
-		//std::cout << e.what() << std::endl;	
+		logException(e);
 		testResults["using Matrix method: transpose"] = false;
 	}
 
